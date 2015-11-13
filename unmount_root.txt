@@ -53,5 +53,5 @@ mount --move /boot /mnt/newroot/boot
 
 cd /mnt/newroot/
 mkdir old_root
-pivot_root . old-root/
+/sbin/pivot_root . old-root/
 umount /old_root
