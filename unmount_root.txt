@@ -1,0 +1,52 @@
+# bash ubuntu trusty kernel 3.3 root fs ext4 lvm, free 2GB in vg lxc 
+# state: failed 
+
+lvcreate -L 2g -n root0 lxc
+mkfs.ext4 /dev/lxc/root0
+
+
+lsof / | grep -v ' \(mem\|txt\|rtd\|cwd\) '
+service nscd stop
+service rsyslogd stop
+service rsyslog stop
+service ntpd stop
+service ntp stop
+service ntp stop
+service nscd stop
+
+
+
+
+mkdir /mnt/newroot
+mkdir /mnt/oldroot
+mount /dev/lxc/root0 /mnt/newroot
+
+for i in `ls  / | grep -v 'proc' | grep -v dev | grep -v sys | grep -v run | grep -v mnt | grep -v 'lost+found' | grep -v 'media' `;do rsync -aAXv  /$i /mnt/newroot/ ;done;
+
+mkdir /mnt/newroot/sys
+chmod 0555 /mnt/newroot/sys
+
+mkdir /mnt/newroot/proc
+chmod 0555 /mnt/newroot/proc
+
+mkdir /mnt/newroot/dev
+chmod 0755 /mnt/newroot/dev
+
+mkdir /mnt/newroot/run
+chmod 0755 /mnt/newroot/run
+
+mkdir /mnt/newroot/mnt
+chmod 0755 /mnt/newroot/mnt
+
+mkdir /mnt/newroot/media
+chmod 0755 /mnt/newroot/media
+
+mount --move /sys /mnt/newroot/sys
+mount --move /proc /mnt/newroot/proc
+mount --move /dev /mnt/newroot/dev
+mount --move /run /mnt/newroot/run
+
+cd /mnt/newroot/
+mkdir old_root
+pivot_root . old-root/
+umount /old_root
