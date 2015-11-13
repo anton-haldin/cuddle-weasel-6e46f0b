@@ -57,5 +57,5 @@ mkdir old_root
 telinit u
 service ssh restart
 
-reboot --force
+#reboot --force
 #umount /old_root
