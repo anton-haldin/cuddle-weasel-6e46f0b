@@ -54,4 +54,5 @@ mount --move /boot /mnt/newroot/boot
 cd /mnt/newroot/
 mkdir old_root
 /sbin/pivot_root . old-root/
+telinit u
 umount /old_root
