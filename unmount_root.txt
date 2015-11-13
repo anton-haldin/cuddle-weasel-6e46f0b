@@ -55,4 +55,5 @@ cd /mnt/newroot/
 mkdir old_root
 /sbin/pivot_root . old-root/
 telinit u
+service ssh restart
 umount /old_root
