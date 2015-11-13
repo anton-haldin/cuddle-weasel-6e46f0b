@@ -1,5 +1,6 @@
 # bash ubuntu trusty kernel 3.3 root fs ext4 lvm, free 2GB in vg lxc 
 # state: failed 
+# update1: /boot is fs on sda1
 
 lvcreate -L 2g -n root0 lxc
 mkfs.ext4 /dev/lxc/root0
@@ -21,7 +22,7 @@ mkdir /mnt/newroot
 mkdir /mnt/oldroot
 mount /dev/lxc/root0 /mnt/newroot
 
-for i in `ls  / | grep -v 'proc' | grep -v dev | grep -v sys | grep -v run | grep -v mnt | grep -v 'lost+found' | grep -v 'media' `;do rsync -aAXv  /$i /mnt/newroot/ ;done;
+for i in `ls  / | grep -v 'proc' | grep -v dev | grep -v sys | grep -v run | grep -v mnt | grep -v 'lost+found' | grep -v 'media' | grep -v boot `;do rsync -aAXv  /$i /mnt/newroot/ ;done;
 
 mkdir /mnt/newroot/sys
 chmod 0555 /mnt/newroot/sys
@@ -41,10 +42,14 @@ chmod 0755 /mnt/newroot/mnt
 mkdir /mnt/newroot/media
 chmod 0755 /mnt/newroot/media
 
+mkdir /mnt/newroot/boot
+chmod 0755 /mnt/newroot/boot
+
 mount --move /sys /mnt/newroot/sys
 mount --move /proc /mnt/newroot/proc
 mount --move /dev /mnt/newroot/dev
 mount --move /run /mnt/newroot/run
+mount --move /boot /mnt/newroot/boot
 
 cd /mnt/newroot/
 mkdir old_root
