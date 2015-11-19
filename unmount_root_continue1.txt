@@ -1,0 +1,37 @@
+# unmount root 
+# sequeance of steps
+# it is not automation which will work in end-to-end style
+# some steps should be done manually
+#
+#
+# we have swap on, /var/lib/nova/instances mounted
+# services are launched: cron rsyslog udev dbus acpid atd nscd ntp nslcd irqbalance
+# processes are running: dhclient getty chef-client
+#
+# directories in /mnt: newroot, oldroot, newroot/old_root
+# copy of root fs was created by using rsync
+# for i in `ls  / | grep -v 'proc' | grep -v dev | grep -v sys | grep -v run | grep -v mnt | grep -v 'lost+found' | grep -v 'media' | grep -v boot `;do rsync -aAXv  /$i /mnt/newroot/ ;done;
+#
+
+
+swapoff -a
+umount /var/lib/nova/instances/
+
+#mount /dev/sdb /mnt/newroot/
+mount /dev/lxc/root0 /mnt/newroot/
+
+for service in cron rsyslog udev dbus acpid atd nscd ntp nslcd irqbalance;do service $service stop;done;
+
+for i in boot dev proc sys run;do mount --move /$i /mnt/newroot/$i;done;
+cd /mnt/newroot/
+pivot_root . old_root
+telinit u
+sleep 5;service ssh restart 
+for process in dhclient getty chef-client;do pkill $process;done;
+
+fuser -vm /old_root
+
+# check if there any processes are holding root
+# if you are using ssh for access this server, then reconnect .
+# kill processes if there are holding /old_root 
+umount /old_root
