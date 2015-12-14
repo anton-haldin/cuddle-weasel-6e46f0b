@@ -1,19 +1,19 @@
 # bash ubuntu trusty kernel 3.3 root fs ext4 lvm, free 2GB in vg lxc 
 # state: failed 
 # update1: /boot is fs on sda1
+# rerequsites: 2Gb in lxc vg, free root0 name for lv, umount /mnt, free names "newroot" "oldroot" in /mnt.
+# we have running services: nscd rsyslogd rsyslog ntpd ntp nscd
 
 lvcreate -L 2g -n root0 lxc
 mkfs.ext4 /dev/lxc/root0
 
 
+declare -a services=(nscd rsyslogd rsyslog ntpd ntp nscd)
+
+
 lsof / | grep -v ' \(mem\|txt\|rtd\|cwd\) '
-service nscd stop
-service rsyslogd stop
-service rsyslog stop
-service ntpd stop
-service ntp stop
-service ntp stop
-service nscd stop
+
+for service in ${services[@]};do service $service stop;done;
 
 
 
